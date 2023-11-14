@@ -19,7 +19,9 @@ import sys
 my_path = b2.create_path()
 b2.set_log_level(b2.LogLevel.ERROR)
 
-#append analysis global tag where the CFT payload is stored                                                                                                #b2.conditions.append_globaltag('mc_production_MC15rd_a_exp24_bucket30')
+#append analysis global tag where the CFT payload is stored
+
+#b2.conditions.append_globaltag('mc_production_MC15rd_a_exp24_bucket30')
 
 input_file = []
 output_file = "out_CFT.root"
