@@ -19,13 +19,12 @@ import sys
 my_path = b2.create_path()
 b2.set_log_level(b2.LogLevel.ERROR)
 
-# append analysis global tag where the CFT payload is stored                                                                                                                                                       
+#append analysis global tag where the CFT payload is stored
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 input_file = []
 output_file = "out_CFT.root"
 ma.inputMdstList(environmentType='default', filelist=input_file, path=my_path)
-
 
 ma.fillParticleList(
     "pi+:D0", "thetaInCDCAcceptance and dr < 1 and abs(dz) < 3", path=my_path
@@ -34,60 +33,60 @@ ma.fillParticleList(
     "K+:D0", "thetaInCDCAcceptance and dr < 1 and abs(dz) < 3", path=my_path
 )
 
-kin_variables = ['E', 'p', 'cosTheta','px', 'py', 'pz', 'pt']
-cms_kinematics = vu.create_aliases(kin_variables, "useCMSFrame({variable})", "CMS")
+kinvars = ['E', 'p', 'cosTheta', 'pt']
+cmsvars = vu.create_aliases(kinvars, "useCMSFrame({variable})", "CMS")
 
 ma.reconstructDecay(
     decayString="D0:Kpi -> K-:D0 pi+:D0",
-    cut="1.66 < M < 2.06 and CMS_p>2",
+    cut="1.66 < M < 2.06",
     path=my_path,
 )
 
 ma.matchMCTruth(list_name="D0:Kpi", path=my_path)
 
 #build the rest of the event associated to the D0
-ma.buildRestOfEvent(target_list_name='D0:Kpi',
-                    path=my_path)
-
+#ma.buildRestOfEvent(target_list_name='D0:Kpi',
+#                    path=my_path)
 
 #Charm Flavor Tagging Function
-cft.charmFlavorTagger(
-    'D0:Kpi',
-    path=my_path)
+#cft.charmFlavorTagger(
+#    'D0:Kpi',
+#    path=my_path)
 
 vx.treeFit('D0:Kpi', conf_level=0.001, updateAllDaughters=True, ipConstraint=True, path=my_path)
+ma.cutAndCopyList('D0:K+pi-', 'D0:Kpi', '1.75 < M < 1.95', writeOut=False, path=my_path)
 
 va.variables.addAlias("genGrandmotherPDG", "genMotherPDG(1)")
 
+vertexvars = vc.flight_info
+vertexvars += ["M", "chiProb","charge"]
 
-track =["dr", "dx","dy","dz"]
-other_sig = ["M","genMotherPDG","genGrandmotherPDG","charge"]
-particleIDs = ['pionID', 'kaonID', 'protonID','electronID', 'muonID', 'deuteronID', 'pidIsMostLikely()']
-trk_variables = ['d0', 'z0', 'phi0', 'omega', 'ndf', 'pValue','nPXDHits', 'nSVDHits', 'nCDCHits','lastCDCLayer', 'firstCDCLayer','nVXDHits']    
-NN_variables = ['kaonIDNN','pionIDNN']
-flight_variables = ['mcFlightTime', 'mcFlightDistance','flightDistance','flightTime',"significanceOfDistance","distance"]
-CFT = ["CFT_qr","CFT_prob"]
+truthvars = vc.mc_truth + vc.mc_variables + ["genGrandmotherPDG", "M"]
+vertextruthvars = vc.mc_flight_info
+vertexvars += truthvars + vertextruthvars
 
-vars = vu.create_aliases_for_selected(list_of_variables=vc.mc_truth, decay_string="^D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=track, decay_string="^D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=other_sig, decay_string="^D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=particleIDs, decay_string="D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=kin_variables, decay_string="^D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=trk_variables, decay_string="^D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=NN_variables, decay_string="D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=flight_variables, decay_string="^D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=CFT, decay_string="^D0 -> ^K- ^pi+") + \
-	vu.create_aliases_for_selected(list_of_variables=cms_kinematics, decay_string="^D0 -> ^K- ^pi+") 
+trackvars = ['d0', 'z0', 'phi0', 'omega', 'charge', 'ndf', 'pValue','nPXDHits', 'nSVDHits', 'nCDCHits']
+pidvars = ['pionID', 'kaonID', 'pionID_noSVD', 'kaonID_noSVD', 'pionIDNN', 'kaonIDNN']
 
-   
+CFT = ["CFT_qr"]
+
+d0vars = vu.create_aliases_for_selected(
+    list_of_variables = vertexvars + kinvars + cmsvars, 
+#+ CFT,
+    decay_string="^D0 -> K- pi+",
+)
+
+fsvars = vu.create_aliases_for_selected(
+    list_of_variables = truthvars + kinvars + cmsvars + trackvars + pidvars, 
+    decay_string="D0 -> ^K- ^pi+",
+)
 
 ma.variablesToNtuple(
-    "D0:Kpi",
-    vars,
+    "D0:K+pi-",
+    d0vars + fsvars,
     filename=output_file,
     treename="D0tree",
     path=my_path,
 )
-
 
 b2.process(my_path)
