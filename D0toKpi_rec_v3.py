@@ -68,7 +68,7 @@ vertexvars += truthvars + vertextruthvars
 trackvars = ['d0', 'z0', 'phi0', 'omega', 'charge', 'ndf', 'pValue','nPXDHits', 'nSVDHits', 'nCDCHits']
 pidvars = ['pionID', 'kaonID', 'pionID_noSVD', 'kaonID_noSVD', 'pionIDNN', 'kaonIDNN']
 
-CFT = ["CFT_qr"]
+#CFT = ["CFT_qr"]
 
 d0vars = vu.create_aliases_for_selected(
     list_of_variables = vertexvars + kinvars + cmsvars, 
