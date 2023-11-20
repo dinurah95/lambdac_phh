@@ -35,7 +35,7 @@ ma.fillParticleList(
 
 kinvars = ['E', 'p', 'cosTheta','pt']
 cmsvars = ['beamE','beamPx','beamPy','beamPz']
-swapmass = vu.create_aliases['M',"useAlternativeDaughterHypothesis(M, 0:pi-, 1:K+)","swap"]
+swapmass = vu.create_aliases('M',"useAlternativeDaughterHypothesis(M, 0:pi-, 1:K+)","swap")
 
 ma.reconstructDecay(
     decayString="D0:Kpi -> K-:D0 pi+:D0",
@@ -58,7 +58,6 @@ vx.treeFit('D0:Kpi', conf_level=0.001, updateAllDaughters=True, ipConstraint=Tru
 ma.cutAndCopyList('D0:K+pi-', 'D0:Kpi', '1.75 < M < 1.95', writeOut=False, path=my_path)
 
 va.variables.addAlias("genGrandmotherPDG", "genMotherPDG(1)")
-
 vertexvars = vc.flight_info
 vertexvars += ["M", "chiProb","charge"]
 
@@ -72,13 +71,13 @@ pidvars = ['pionID', 'kaonID', 'pionID_noSVD', 'kaonID_noSVD', 'pionIDNN', 'kaon
 CFT = ["CFT_qr"]
 
 d0vars = vu.create_aliases_for_selected(
-    list_of_variables = vertexvars + kinvars + cmsvars, 
+    list_of_variables = vertexvars + kinvars + cmsvars + swapmass, 
 #+ CFT,
     decay_string="^D0 -> K- pi+",
 )
 
 fsvars = vu.create_aliases_for_selected(
-    list_of_variables = truthvars + kinvars + cmsvars + trackvars + pidvars + swapmass, 
+    list_of_variables = truthvars + kinvars + cmsvars + trackvars + pidvars, 
     decay_string="D0 -> ^K- ^pi+",
 )
 
