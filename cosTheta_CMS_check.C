@@ -1,4 +1,4 @@
-//This program is for best candidate selections by assign a new variable value for Ks
+//This program is for best candidate selections 
 #include "TTree.h"
 #include "TFile.h"
 #include "TH1.h"
@@ -56,7 +56,7 @@ void cosTheta_CMS_check (TString input) {
  
   std::cout << "New output root file defined" << std::endl;
 
-//define what to right to  the Tree as leafs
+//define what goes to the Tree as leafs
 
  LowMod1->Branch("isSignal", &isSignal,"isSignal");
  LowMod1->Branch("beamE", &beamE,"beamE/D");
@@ -71,7 +71,7 @@ void cosTheta_CMS_check (TString input) {
  LowMod1->Branch("mycosTheta", &mycosTheta,"mycosTheta/D"); // cosTheta_CMS distribution made by myself
  LowMod1->Branch("boost", &boost,"boost");
  
- std::cout << "defined what to right to  the Tree as leafs" << std::endl;
+ std::cout << "defined what goes to the Tree as leafs" << std::endl;
   
   std::cout << "Starting for loop" << std::endl;
   for (Long64_t iEntry(0); iEntry < nEntries1; ++iEntry){
