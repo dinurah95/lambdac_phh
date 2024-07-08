@@ -104,24 +104,16 @@ va.variables.addAlias('gamma1_mcPDG', 'daughter(1,mcPDG)')
 gamma_var = ['gamma0_cpsd', 'gamma0_bbs', 'gamma0_fps', 'gamma0_e9e21', 
              'gamma1_cpsd', 'gamma1_bbs', 'gamma1_fps', 'gamma1_e9e21']
 
-
-
 gamma_var_mc = ['gamma0_mcErrors', 'gamma0_genmother_0', 'gamma0_mcPDG',  
                 'gamma1_mcErrors', 'gamma1_genmother_0', 'gamma1_mcPDG']
 
-
-
 xicvars = ['M', 'cosTheta', 'isSignal', 'vertex_chi2rank', 'vtxChi2','charge','chiProb','PDG']
-
-
-
 
 # event level variables
 #eventWiseVariables = ['nTracks','beamE','beamPx','beamPy','beamPz']
 #eventWiseVariables += ['IPX','IPY','IPZ']
 #eventWiseVariables += ['eventRandom']
 eventWiseVariables = ['eventRandom']
-
 
 # common variables
 commonVariables = vc.kinematics
@@ -137,15 +129,12 @@ trackVariables += ['cosTheta']
 J_trackVariables = vc.track_hits
 J_trackVariables += ['dr','dz','protonID','pionID','kaonID']
 
-
-
 # composite variables
 compositeVariables = vc.inv_mass
 compositeVariables += ['distance']
 compositeVariables += ['prodVertexX', 'prodVertexY', 'prodVertexZ', 'significanceOfDistance']
 compositeVariables += ['cosAngleBetweenMomentumAndVertexVector']
 compositeVariables += ['mcFlightTime', 'mcFlightDistance','flightDistance']
-
 
 # cluster variables                                                                                                                                                                               
 clusterVariables = vc.cluster
@@ -250,8 +239,6 @@ ma.variablesToNtuple(decayString='Xi_c+:sigpipi', variables=xicp_sigpipi_vars+ev
                      treename='xicp_sigpipi', path=mypath)
 ma.variablesToNtuple(decayString='Xi_c+:sigkk', variables=xicp_sigkk_vars+eventWiseVariables, filename="ntuple.root",
                      treename='xicp_sigkk', path=mypath)
-
-
 
 
 ma.variablesToNtuple(decayString='Lambda_c+:sigpipi', variables=lcp_sigpipi_vars+eventWiseVariables, filename="ntuple.root",
