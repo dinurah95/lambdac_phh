@@ -14,7 +14,6 @@ from hepstats.splot import compute_sweights
 import uncertainties as un
 from uncertainties import unumpy
 
-
 # %%
 import ROOT as r
 r.gROOT.LoadMacro('/belle2work/BelleII/belle2style/Belle2Style.C') 
@@ -26,7 +25,6 @@ plt.rcParams.update({
           'figure.figsize': (12, 8),
 })
 
-
 # %%
 # Define columns to read into memory
 col = ["Lambdac_M","Lambdac_cosTheta_cms","p_charge"]
@@ -36,25 +34,20 @@ mccol =["Lambdac_isSignal"]
 siginfile = '/b2diska/dinura/rootfiles/ntuples/MC/lcp/ppipi_s.root'
 ctrinfile = '/b2diska/dinura/rootfiles/ntuples/MC/lcp/weights/pkpi_ppipi_weighted.root'
 
-
 # %%
 sigdf = root_pandas.read_root(siginfile, key='lcp_ppipi', columns=col+mccol, where='Lambdac_M > 2.24 && Lambdac_M < 2.34')
 
-
 # %%
 ctrdf = root_pandas.read_root(ctrinfile, key='lcp_pkpi', columns=col+ctrcol+mccol, where= 'Lambdac_M > 2.24 && Lambdac_M < 2.34')
-
 
 # %%
 # Standard plot settings
 lupper = 2.34
 llower = 2.24
 
-
 # %%
 # Standard cuts for lambda_c and D^0
 lc_cut = str(llower)+' < Lambdac_M < '+str(lupper)
-
 
 # %%
 binedges=[-1,0,1]
@@ -63,7 +56,6 @@ bin2 = str(binedges[1])+"<=Lambdac_cosTheta_cms<"+str(binedges[2])
 print("bin range")
 print(bin1)
 print(bin2)
-
 
 # %%
 # Method to overlay fitted pdfs and data sample
@@ -107,25 +99,20 @@ def plot_model(model, mydata, nevents, nbins=100, myrange=(llower,lupper), mylab
         plt.savefig(save_path)
         print(f"Plot saved at {save_path}")
 
-
-
-
 # %%
 # # Apply weights for A$_{CP}$ fit
-# find the momentum and cos(theta) bin for each event
+# Find the momentum and cos(theta) bin for each event
 pkpidf = ctrdf.query(lc_cut)
 pkpidf_bin1 = ctrdf.query(lc_cut+" and "+bin1+' and p_charge==1')
 pkpidf_bin2 = ctrdf.query(lc_cut+" and "+bin2+' and p_charge==1')
 apkpidf_bin1 = ctrdf.query(lc_cut+" and "+bin1+' and p_charge==-1')
 apkpidf_bin2 = ctrdf.query(lc_cut+" and "+bin2+' and p_charge==-1')
 
-
 # %%
 # this is a little dangerous since we replace keys with indices that depend on the order 
 def getWeights(df):
     np_arr = df.to_numpy()
     return np_arr[:,0], np_arr[:,3]
-
 
 # %%
 pkpi_M, pkpi_weights = getWeights(pkpidf)
@@ -147,7 +134,6 @@ signal = sigdf.query(lc_cut + ' and Lambdac_isSignal==1').Lambdac_M.to_numpy()
 bkg = sigdf.query(lc_cut + ' and Lambdac_isSignal!=1').Lambdac_M.to_numpy()
 print('signal: ' + str(len(signal)))
 print('bkg: ' + str(len(bkg)))
-
 
 # %%
 # Signal fit parameters
@@ -182,7 +168,6 @@ data = zfit.data.Data.from_numpy(obs=lcobs, array=data_np)
 data.set_data_range(lcrange) 
 data_size = data.n_events
 
-
 # %%
 # Fix background to zero
 a1.floating = False
@@ -197,10 +182,8 @@ result = minimizer.minimize(nll_simultaneous)
 print("signal fit - signal channel")
 print(result)
 
-
 # %%
 plot_model(model=pdf_ext, mydata=data, nevents=int(data_size), mylabel=r'$\Lambda_c$ Mass ($\Lambda_c^+\rightarrow p \pi^- \pi^+$)  [GeV/$c^{2}$]', plot_data=True, save_dir="/b2diska/dinura/scripts/acp/py/ppipi/plots/weighted/", save_name="signal_fit_signalchannel")
-
 
 # %%
 # Save the signal parameters
@@ -250,10 +233,8 @@ result = minimizer.minimize(nll_simultaneous)
 print("intergrated fit - control channel")
 print(result)
 
-
 # %%
 plot_model(model=pdf_ext, mydata=data, myrange=lcrange, nevents=int(data_size), mylabel=r'$\Lambda_c$ Mass ($\Lambda_c^+\rightarrow p K^- \pi^+$)  [GeV/$c^{2}$]', plot_data=True, save_dir="/b2diska/dinura/scripts/acp/py/ppipi/plots/weighted/", save_name="intergrated_fit_controlchannel")
-
 
 # %%
 # Save the control parameters
@@ -287,7 +268,6 @@ nasigtruee=[]
 nsige=[]
 nasige=[]
 
-
 # %%
 nctrtrue=[]
 nactrtrue=[]
@@ -317,7 +297,6 @@ class LcSigGauss1(zfit.pdf.ZPDF):
         std = self.params['std']
         return 1/(std*lcsigsigma1*np.sqrt(2*np.pi))*z.exp(- ((x - (mean+lcsigmean)) / (std*lcsigsigma1)) ** 2)
 
-
 # %%
 class LcSigGauss2(zfit.pdf.ZPDF):
     _N_OBS = 1  # dimension, can be omitted
@@ -328,7 +307,6 @@ class LcSigGauss2(zfit.pdf.ZPDF):
         mean = self.params['mean']
         std = self.params['std']
         return 1/(std*lcsigsigma2*np.sqrt(2*np.pi))*z.exp(- ((x - (mean+lcsigmean)) / (std*lcsigsigma2)) ** 2)
-
 
 # %%
 class LcCtrGauss1(zfit.pdf.ZPDF):
@@ -341,7 +319,6 @@ class LcCtrGauss1(zfit.pdf.ZPDF):
         std = self.params['std']
         return 1/(std*lcctrsigma1*np.sqrt(2*np.pi))*z.exp(- ((x - (mean+lcctrmean)) / (std*lcctrsigma1)) ** 2)
 
-
 # %%
 class LcCtrGauss2(zfit.pdf.ZPDF):
     _N_OBS = 1  # dimension, can be omitted
@@ -352,7 +329,6 @@ class LcCtrGauss2(zfit.pdf.ZPDF):
         mean = self.params['mean']
         std = self.params['std']
         return 1/(std*lcctrsigma2*np.sqrt(2*np.pi))*z.exp(- ((x - (mean+lcctrmean)) / (std*lcctrsigma2)) ** 2)
-
 
 # %%
 # signal fit parameters
@@ -394,7 +370,6 @@ asig_bkg_ext = asig_poly.create_extended(asig_bkg_yield)
 
 asig_pdf_ext = zfit.pdf.SumPDF(pdfs=[asig_sig_ext,asig_bkg_ext])
 
-
 # %%
 # Fit parameters
 ctr_fg1 = zfit.Parameter("ctr_fg1", 0.02, 0., 1.)
@@ -435,7 +410,6 @@ actr_bkg_ext = actr_poly.create_extended(actr_bkg_yield)
 
 actr_pdf_ext = zfit.pdf.SumPDF(pdfs=[actr_sig_ext,actr_bkg_ext])
 
-
 # %%
 # Fix values from signal fit
 sig_fg1.set_value(lcsigfg1)
@@ -447,7 +421,6 @@ asig_fg1.floating = False
 # ## bin 1
 
 print(bin1)
-
 
 # %%
 # Get the signal and background for reference
@@ -477,7 +450,6 @@ actr_bkg = ctrdf.query(lc_cut+" and "+bin1+' and Lambdac_isSignal!=1 and p_charg
 print('actr signal bin1 - not weighted: ' + str(len(actr_signal)))
 print('actr bkg bin1 - not weighted: ' + str(len(actr_bkg)))
 nactrtrue.append(len(actr_signal))
-
 
 # %%
 # Fill an array with the data to be fit
@@ -529,7 +501,6 @@ minimizer = zfit.minimize.Minuit()
 result = minimizer.minimize(nll_simultaneous)
 print(result)
 
-
 # %%
 result.hesse()
 
@@ -577,7 +548,6 @@ plot_model(model=actr_pdf_ext, mydata=actr_data, nevents=int(actr_data_size), my
 
 print(bin2)
 
-
 # %%
 # Get the signal and background for reference
 print("truthed-matched values bin2")
@@ -606,7 +576,6 @@ actr_bkg = ctrdf.query(lc_cut+" and "+bin2+' and Lambdac_isSignal!=1 and p_charg
 print('actr signal bin2 - not weighted: ' + str(len(actr_signal)))
 print('actr bkg bin2 - not weighted: ' + str(len(actr_bkg)))
 nactrtrue.append(len(actr_signal))
-
 
 # %%
 # Fill an array with the data to be fit
@@ -731,7 +700,6 @@ nactrweighted=[]
 nctrweighted_un=[]
 nactrweighted_un=[]
 
-
 # %%
 # Get the weighted true Acp value
 ctr_signal = ctrdf.query(lc_cut+" and "+bin1+' and Lambdac_isSignal==1 and p_charge==1')['reWeights'].to_numpy()
@@ -750,7 +718,6 @@ print('weighted actr bkg bin1: ' + str(np.sum(actr_bkg)))
 nactrweighted.append(np.sum(actr_signal))
 nactrweighted_un.append(np.sum(actr_signal_2))
 
-
 # %%
 ctr_signal = ctrdf.query(lc_cut+" and "+bin2+' and Lambdac_isSignal==1 and p_charge==1')['reWeights'].to_numpy()
 ctr_signal_2 = ctr_signal*ctr_signal
@@ -767,7 +734,6 @@ print('weighted actr signal bin2: ' + str(np.sum(actr_signal)))
 print('weighted actr bkg bin2: ' + str(np.sum(actr_bkg)))
 nactrweighted.append(np.sum(actr_signal))
 nactrweighted_un.append(np.sum(actr_signal_2))
-
 
 # %%
 nctrweightede = np.sqrt(nctrweighted_un)
@@ -789,18 +755,16 @@ def getAsym(sig,asig,ctr,actr):
     
     return a1, a2, acp
 
-
 # %%
 print("true acp")
 print(getAsym(trsigar,trasigar,trctrar,tractrar)) #True Acp Values
-
 
 # %%
 print("true weighted acp")
 print(getAsym(trsigar,trasigar,trctrwar,tractrwar)) #True Weighted Acp
 
-
 # %%
 print("fit acp")
 print(getAsym(sigar,asigar,ctrar,actrar)) #Weighted Fit Acp Values
 
+print("Acp calculations are complete!")
